@@ -7,15 +7,21 @@ var EMPTY = 0;
 var SNAKE = 1;
 var FRUIT = 2;
 
+// Directions
+var LEFT = 0;
+var UP = 1;
+var RIGHT = 2;
+var DOWN = 3;
+
 //-----------------------------------------------------
 var grid = {
 	width: null,
-	heigth: null,
+	height: null,
 	grid: null,
 	
 	init: function(defaultId, columns, rows) {
 		this.width = columns;
-		this.heigth = rows;
+		this.height = rows;
 		
 		this.grid = [];
 		for ( var x = 0; x < columns; x++ ) {
@@ -49,26 +55,128 @@ var snake = {
 		this.insert(column, row);
 	},
 	
+	// Prepends a new element in the queue, and set 'last' to this new prepended element
 	insert: function(value, x, y) {
-	
-	
+		this.queue.unshift( {x:x, y:y} );
+		this.last = this.queue[0];
 	},
 	
-	remove: function() {}
+	// Remove and return the last element of the queue
+	remove: function() {
+		return this.queue.pop()
+	}
 }
 
 //-----------------------------------------------------
-function setFood() {}
+function setFood() {
+	
+	// We need to track all the empty spaces in the grid
+	var empty = [];
+	for ( var x = 0; x < grid.width; x++ ) {
+		for ( var y = 0; y < grid.height; y++ ) {
+			if ( grid.get(x, y) == EMPTY ) {
+				empty.push( {x:x, y:y} );
+			}
+		}
+	}
+	
+	var randomPosition = empty[Math.floor( Math.random() * empty.length )];
+	grid.set(FRUIT, randomPosition.x, randomPosition.y);
+}
 
 //-----------------------------------------------------
-function main() {}
+// Game objects
+var canvas, context, keystate, frames;
 
-function init() {}
+function main() {
+	canvas = document.createElement("canvas");
+	canvas.width = COLUMNS * 20;
+	canvas.height = ROWS * 20;
+	context = canvas.getContext("2d");
+	document.body.appendChild(canvas);
+	
+	frames = 0;
+	keystate = {};
+	
+	init();
+	loop();
+}
 
-function loop() {}
+function init() {
+	grid.init(EMPTY, COLUMNS, ROWS);
+	
+	var startPosition = {x:Math.floor(COLUMNS/2), y:Math.floor(ROWS/2)};
+	snake.init(UP, startPosition.x, startPosition.y);
+	grid.set(SNAKE, startPosition.x, startPosition.y);
+	
+	setFood();
+}
 
-function draw() {}
+function loop() {
+	update();
+	draw();
+	
+	window.requestAnimationFrame(loop, canvas);
+}
 
+function update() {
+	frames++;
+	
+	if (frames%5 === 0) {
+		var newX = snake.last.x;
+		var newY = snake.last.y;
+		
+		switch(snake.direction) {
+			case LEFT:
+				newX--;
+				break;
+			case RIGHT:
+				newX++
+				break;
+			case UP:
+				newY--;
+				break;
+			case DOWN:
+				newY++;
+				break;
+			default:
+				break;
+		}
+		
+		var tail = snake.remove();
+		grid.set(EMPTY, tail.x, tail.y);
+		tail.x = newX;
+		tail.y = newY;
+		grid.set(SNAKE, tail.x, tail.y);
+		
+		snake.insert(tail.x, tail.y);
+	}
+}
+
+function draw() {
+	var tileWidth = canvas.width / grid.width;
+	var tileHeight = canvas.height / grid.height;
+	
+	for ( var x = 0; x < grid.width; x++ ) {
+		for ( var y = 0; y < grid.height; y++ ) {
+			switch ( grid.get(x, y) ) {
+				case EMPTY:
+					context.fillStyle = "#ecf0f1";
+					break;
+				case SNAKE:
+					context.fillStyle = "#2ecc71";
+					break;
+				case FRUIT:
+					context.fillStyle = "#e74c3c";
+					break;
+				default:
+					break;
+			}
+			context.fillRect( x * tileWidth, y * tileHeight, tileWidth, tileHeight );
+		}
+	}
+
+}
 
 //-----------------------------------------------------
 
