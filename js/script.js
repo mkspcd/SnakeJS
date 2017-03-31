@@ -1,6 +1,6 @@
 // Constants
-var COLUMNS = 20;
-var ROWS = 20;
+var COLUMNS	= 20;
+var ROWS	= 20;
 
 // Grid content
 var EMPTY = 0;
@@ -8,36 +8,36 @@ var SNAKE = 1;
 var FRUIT = 2;
 
 // Directions
-var LEFT = 0;
-var UP = 1;
-var RIGHT = 2;
-var DOWN = 3;
+var LEFT	= 0;
+var UP		= 1;
+var RIGHT	= 2;
+var DOWN	= 3;
 
 //-----------------------------------------------------
 var grid = {
 	width: null,
 	height: null,
-	grid: null,
+	_grid: null,
 	
 	init: function(defaultId, columns, rows) {
 		this.width = columns;
 		this.height = rows;
 		
-		this.grid = [];
+		this._grid = [];
 		for ( var x = 0; x < columns; x++ ) {
-			this.grid.push([]);
+			this._grid.push([]);
 			for ( var y = 0; y < rows; y++ ) {
-				this.grid[x].push(defaultId);
+				this._grid[x].push(defaultId);
 			}
 		}
 	},
 	
 	set: function(id, x, y) {
-		this.grid[x][y] = id;
+		this._grid[x][y] = id;
 	},
 	
 	get: function(x, y) {
-		return this.grid[x][y];
+		return this._grid[x][y];
 	}
 }
 
@@ -56,7 +56,7 @@ var snake = {
 	},
 	
 	// Prepends a new element in the queue, and set 'last' to this new prepended element
-	insert: function(value, x, y) {
+	insert: function(x, y) {
 		this.queue.unshift( {x:x, y:y} );
 		this.last = this.queue[0];
 	},
@@ -125,7 +125,8 @@ function update() {
 	if (frames%5 === 0) {
 		var newX = snake.last.x;
 		var newY = snake.last.y;
-		
+		console.log("newX : " + newX + ", newY : " + newY);
+			
 		switch(snake.direction) {
 			case LEFT:
 				newX--;
@@ -143,12 +144,18 @@ function update() {
 				break;
 		}
 		
+		// Checks if the snake touches the borders
+		if(	0 > newX || newX > grid.width - 1 
+		   	|| 0 > newY || newY > grid.height - 1 
+		   	|| grid.get(newX, newY) === SNAKE ) {
+		   return init();
+		}
+
 		var tail = snake.remove();
 		grid.set(EMPTY, tail.x, tail.y);
 		tail.x = newX;
 		tail.y = newY;
-		grid.set(SNAKE, tail.x, tail.y);
-		
+
 		snake.insert(tail.x, tail.y);
 	}
 }
@@ -168,8 +175,6 @@ function draw() {
 					break;
 				case FRUIT:
 					context.fillStyle = "#e74c3c";
-					break;
-				default:
 					break;
 			}
 			context.fillRect( x * tileWidth, y * tileHeight, tileWidth, tileHeight );
