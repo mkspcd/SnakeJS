@@ -15,6 +15,9 @@ var UP		= 2;
 var RIGHT	= 3;
 var DOWN	= 4;
 
+// Game speed (higher = slower)
+var SPEED	= 6;
+
 // Keycodes
 var KEY_LEFT	= 37;
 var KEY_UP		= 38;
@@ -25,10 +28,6 @@ var KEY_DOWN	= 40;
 var EMPTY_COLOR	= "#bbc701";
 var SNAKE_COLOR	= "#6c5f00";
 var FOOD_COLOR	= "#6c5f00";
-
-// GameState (pregame, ingame, paused, gameover)
-
-
 
 //-----------------------------------------------------
 var board = {
@@ -57,8 +56,6 @@ var board = {
 		return this.grid[x][y];
 	}
 }
-
-
 
 //-----------------------------------------------------
 var snake = {
@@ -111,7 +108,7 @@ function setFood() {
 
 //-----------------------------------------------------
 // Game objects
-var canvas, context, keystate, frames;
+var canvas, context, keystate, frames, points;
 
 function main() {
 	canvas = document.createElement("canvas");
@@ -122,6 +119,7 @@ function main() {
 	
 	frames = 0;
 	keystate = 0;
+	points = 0;
 	
 	document.addEventListener("keydown", function(event) {
 		keystate = event.keyCode;
@@ -137,7 +135,8 @@ function main() {
 function init() {
 	board.init();
 	snake.init();
-	setFood();	
+	setFood();
+	points = 0;
 }
 
 function loop() {
@@ -150,13 +149,14 @@ function loop() {
 function update() {
 	frames++;
 	
-	if (keystate == KEY_LEFT) { snake.direction = LEFT; }
-	if (keystate == KEY_UP) { snake.direction = UP; }
-	if (keystate == KEY_RIGHT){ snake.direction = RIGHT; }
-	if (keystate == KEY_DOWN) { snake.direction = DOWN; }
+	if (keystate == KEY_LEFT && snake.direction !== RIGHT) { snake.direction = LEFT; }
+	if (keystate == KEY_UP && snake.direction !== DOWN) { snake.direction = UP; }
+	if (keystate == KEY_RIGHT && snake.direction !== LEFT){ snake.direction = RIGHT; }
+	if (keystate == KEY_DOWN && snake.direction !== UP) { snake.direction = DOWN; }
 	
-	if (frames%10 == 0) {
+	if (frames % SPEED == 0) {
 		console.log("Frames : " + frames);
+		if (frames === 1000 * SPEED) { frames = 0; }
 		
 		var newX = snake.last.x;
 		var newY = snake.last.y;
@@ -176,23 +176,27 @@ function update() {
 				break;
 		}
 		
-		if ( 0 > newX || newX > board.width - 1 || 0 > newY || newY > board.height - 1 ) {
+		if ( 0 > newX || newX > board.width - 1 || 0 > newY || newY > board.height - 1 || board.get(newX, newY) == SNAKE) {
 			return init();
 		}
 		
 		if ( board.get(newX, newY) == FOOD ) {
-			setFood();	
+			var tail = {x:newX, y:newY};
+			points++;
+			setFood();
+		} else {
+			var tail = snake.remove();
+			board.set(EMPTY, tail.x, tail.y);
+			tail.x = newX;
+			tail.y = newY;			
 		}
 		
-		var tail = snake.remove();
-		board.set(EMPTY, tail.x, tail.y);
-		tail.x = newX;
-		tail.y = newY;
 		board.set(SNAKE, tail.x, tail.y);
-		
 		snake.insert(tail.x, tail.y);
-	}
-	
+		
+		var score = document.getElementById("score");
+		score.innerHTML = "SCORE : " + points;
+	}	
 }
 
 function draw() {
@@ -221,33 +225,10 @@ main();
 
 
 /*
-Amelioration : 
-color bg and font in js
-food cannot be near snake at beginning
-variable spped : the longer the snake, the fastest the game
-snake start still, and doesn't move until the player press a direction
-
-
+Ameliorations to consider :
+	- Body bg color bg and font ccolor so that if someone want to switch colors, he only needs to mmodify the snake.js file (and not the style.css file),
+	- Food cannot be near/against the snake at the beginning of the game,
+	- Variable speed game : the longer the snake, the faster the game,
+	- Snake start still, and doesn't move until the player press a direction.
+	- Different gamestates (pregame, ingame, paused, gameover) : useful if I want to add the ability to pause the game, etc.
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
