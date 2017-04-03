@@ -15,6 +15,12 @@ var UP		= 2;
 var RIGHT	= 3;
 var DOWN	= 4;
 
+// Keycodes
+var KEY_LEFT	= 37;
+var KEY_UP		= 38;
+var KEY_RIGHT	= 39;
+var KEY_DOWN	= 40;
+
 // Game colors
 var EMPTY_COLOR	= "#bbc701";
 var SNAKE_COLOR	= "#6c5f00";
@@ -61,7 +67,7 @@ var snake = {
 	queue		: null,
 	
 	init: function() {
-		this.direction	= NONE;		
+		this.direction	= RIGHT;		
 		this.queue		= [];
 		
 		// Insert the firts joints : 
@@ -115,6 +121,14 @@ function main() {
 	document.getElementById("game").appendChild(canvas);
 	
 	frames = 0;
+	keystate = 0;
+	
+	document.addEventListener("keydown", function(event) {
+		keystate = event.keyCode;
+	});
+	document.addEventListener("keyup", function(event) {
+		keystate = 0;
+	});
 	
 	init();
 	loop();
@@ -134,6 +148,51 @@ function loop() {
 }
 
 function update() {
+	frames++;
+	
+	if (keystate == KEY_LEFT) { snake.direction = LEFT; }
+	if (keystate == KEY_UP) { snake.direction = UP; }
+	if (keystate == KEY_RIGHT){ snake.direction = RIGHT; }
+	if (keystate == KEY_DOWN) { snake.direction = DOWN; }
+	
+	if (frames%10 == 0) {
+		console.log("Frames : " + frames);
+		
+		var newX = snake.last.x;
+		var newY = snake.last.y;
+		
+		switch(snake.direction) {
+			case LEFT:
+				newX--;
+				break;
+			case UP:
+				newY--;
+				break;
+			case RIGHT:
+				newX++;
+				break;
+			case DOWN:
+				newY++;
+				break;
+		}
+		
+		if ( 0 > newX || newX > board.width - 1 || 0 > newY || newY > board.height - 1 ) {
+			return init();
+		}
+		
+		if ( board.get(newX, newY) == FOOD ) {
+			setFood();	
+		}
+		
+		var tail = snake.remove();
+		board.set(EMPTY, tail.x, tail.y);
+		tail.x = newX;
+		tail.y = newY;
+		board.set(SNAKE, tail.x, tail.y);
+		
+		snake.insert(tail.x, tail.y);
+	}
+	
 }
 
 function draw() {
@@ -165,6 +224,8 @@ main();
 Amelioration : 
 color bg and font in js
 food cannot be near snake at beginning
+variable spped : the longer the snake, the fastest the game
+snake start still, and doesn't move until the player press a direction
 
 
 */
