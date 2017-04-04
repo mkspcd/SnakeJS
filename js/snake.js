@@ -15,8 +15,8 @@ var UP		= 2;
 var RIGHT	= 3;
 var DOWN	= 4;
 
-// Game speed (higher = slower)
-var SPEED	= 6;
+// Game speed (higher is slower)
+var SPEED	= 10;
 
 // Keycodes
 var KEY_LEFT	= 37;
