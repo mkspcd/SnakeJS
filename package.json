@@ -1,0 +1,22 @@
+{
+  "name": "snakejs",
+  "version": "0.0.1",
+  "description": "The classic game Snake, written in JavaScript.",
+  "keywords": [],
+  "author": "mkspcd <mkspcd@gmail.com>",
+  "license": "ISC",
+  "private": true,
+  "main": "index.js",
+  "homepage": "https://github.com/mkspcd/SnakeJS#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mkspcd/SnakeJS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mkspcd/SnakeJS/issues"
+  }
+}
+
