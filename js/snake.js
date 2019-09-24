@@ -1,33 +1,33 @@
 // Constants - modify the CSS accordingly
-const COLUMNS	= 20;
-const ROWS	= 20;
-const SIZE	= 20;
+const COLUMNS	= 20
+const ROWS	= 20
+const SIZE	= 20
 
 // Grid content values
-const EMPTY	= 0;
-const SNAKE	= 1;
-const FOOD	= 2;
+const EMPTY	= 0
+const SNAKE	= 1
+const FOOD	= 2
 
 // Snake directions
-const NONE	= 0;
-const LEFT	= 1;
-const UP		= 2;
-const RIGHT	= 3;
-const DOWN	= 4;
+const NONE	= 0
+const LEFT	= 1
+const UP		= 2
+const RIGHT	= 3
+const DOWN	= 4
 
 // Game speed (higher is slower)
-const SPEED	= 10;
+const SPEED	= 10
 
 // Keycodes
-const KEY_LEFT	= 37;
-const KEY_UP		= 38;
-const KEY_RIGHT	= 39;
-const KEY_DOWN	= 40;
+const KEY_LEFT	= 37
+const KEY_UP		= 38
+const KEY_RIGHT	= 39
+const KEY_DOWN	= 40
 
 // Game colors
-const EMPTY_COLOR	= "#bbc701";
-const SNAKE_COLOR	= "#6c5f00";
-const FOOD_COLOR	= "#6c5f00";
+const EMPTY_COLOR	= "#bbc701"
+const SNAKE_COLOR	= "#6c5f00"
+const FOOD_COLOR	= "#6c5f00"
 
 //-----------------------------------------------------
 const board = {
@@ -36,24 +36,24 @@ const board = {
 	grid	: null,
 
 	init: function() {
-		this.width	= COLUMNS;
-		this.height	= ROWS;
+		this.width	= COLUMNS
+		this.height	= ROWS
 
-		this.grid = [];
+		this.grid = []
 		for ( var x = 0; x < COLUMNS; x++ ) {
-			this.grid.push([]);
+			this.grid.push([])
 			for ( var y = 0; y < ROWS; y++ ) {
-				this.grid[x].push(EMPTY);
+				this.grid[x].push(EMPTY)
 			}
 		}
 	},
 
 	set: function(value, x, y) {
-		this.grid[x][y] = value;
+		this.grid[x][y] = value
 	},
 
 	get: function(x, y) {
-		return this.grid[x][y];
+		return this.grid[x][y]
 	}
 }
 
@@ -64,23 +64,23 @@ const snake = {
 	queue		: null,
 
 	init: function() {
-		this.direction	= RIGHT;
-		this.queue		= [];
+		this.direction	= RIGHT
+		this.queue		= []
 
 		// Insert the firts joints :
-		this.insert( Math.floor(COLUMNS/2) - 3, Math.floor(ROWS/2));
-		this.insert( Math.floor(COLUMNS/2) - 2, Math.floor(ROWS/2));
-		this.insert( Math.floor(COLUMNS/2) - 1, Math.floor(ROWS/2));
+		this.insert( Math.floor(COLUMNS/2) - 3, Math.floor(ROWS/2))
+		this.insert( Math.floor(COLUMNS/2) - 2, Math.floor(ROWS/2))
+		this.insert( Math.floor(COLUMNS/2) - 1, Math.floor(ROWS/2))
 
 		for ( let i = 0; i < snake.queue.length; i++) {
-			board.set(SNAKE, snake.queue[i].x, snake.queue[i].y);
+			board.set(SNAKE, snake.queue[i].x, snake.queue[i].y)
 		}
 	},
 
 	// Prepends a new element in the queue, and set 'last' to this new prepended element
 	insert: function(x, y) {
-		this.queue.unshift( {x:x, y:y} );
-		this.last = this.queue[0];
+		this.queue.unshift( {x:x, y:y} )
+		this.last = this.queue[0]
 	},
 
 	// Remove and return the last element of the queue
@@ -93,110 +93,110 @@ const snake = {
 function setFood() {
 
 	// We need to track all the empty spaces in the grid
-	const empty = [];
+	const empty = []
 	for ( let x = 0; x < board.width; x++ ) {
 		for ( let y = 0; y < board.height; y++ ) {
 			if ( board.get(x, y) == EMPTY ) {
-				empty.push( {x:x, y:y} );
+				empty.push( {x:x, y:y} )
 			}
 		}
 	}
 
-	const randomPosition = empty[Math.floor( Math.random() * empty.length )];
-	board.set(FOOD, randomPosition.x, randomPosition.y);
+	const randomPosition = empty[Math.floor( Math.random() * empty.length )]
+	board.set(FOOD, randomPosition.x, randomPosition.y)
 }
 
 //-----------------------------------------------------
 // Game objects
-let canvas, context, keystate, frames, points;
+let canvas, context, keystate, frames, points
 
 function main() {
-	canvas = document.createElement("canvas");
-	canvas.width = COLUMNS * SIZE;
-	canvas.height = ROWS * SIZE;
-	context = canvas.getContext("2d");
-	document.getElementById("game").appendChild(canvas);
+	canvas = document.createElement("canvas")
+	canvas.width = COLUMNS * SIZE
+	canvas.height = ROWS * SIZE
+	context = canvas.getContext("2d")
+	document.getElementById("game").appendChild(canvas)
 
-	frames = 0;
-	keystate = 0;
-	points = 0;
+	frames = 0
+	keystate = 0
+	points = 0
 
 	document.addEventListener("keydown", function(event) {
-		keystate = event.keyCode;
-	});
+		keystate = event.keyCode
+	})
 	document.addEventListener("keyup", function(event) {
-		keystate = 0;
-	});
+		keystate = 0
+	})
 
-	init();
-	loop();
+	init()
+	loop()
 }
 
 function init() {
-	board.init();
-	snake.init();
-	setFood();
-	points = 0;
+	board.init()
+	snake.init()
+	setFood()
+	points = 0
 }
 
 function loop() {
-	update();
-	draw();
+	update()
+	draw()
 
-	window.requestAnimationFrame(loop, canvas);
+	window.requestAnimationFrame(loop, canvas)
 }
 
 function update() {
-	frames++;
+	frames++
 
-	if (keystate == KEY_LEFT && snake.direction !== RIGHT) { snake.direction = LEFT; }
-	if (keystate == KEY_UP && snake.direction !== DOWN) { snake.direction = UP; }
-	if (keystate == KEY_RIGHT && snake.direction !== LEFT){ snake.direction = RIGHT; }
-	if (keystate == KEY_DOWN && snake.direction !== UP) { snake.direction = DOWN; }
+	if (keystate == KEY_LEFT && snake.direction !== RIGHT) { snake.direction = LEFT }
+	if (keystate == KEY_UP && snake.direction !== DOWN) { snake.direction = UP }
+	if (keystate == KEY_RIGHT && snake.direction !== LEFT){ snake.direction = RIGHT }
+	if (keystate == KEY_DOWN && snake.direction !== UP) { snake.direction = DOWN }
 
 	if (frames % SPEED == 0) {
-		console.log("Frames : " + frames);
-		if (frames === 1000 * SPEED) { frames = 0; }
+		console.log("Frames : " + frames)
+		if (frames === 1000 * SPEED) { frames = 0 }
 
-		let newX = snake.last.x;
-		let newY = snake.last.y;
+		let newX = snake.last.x
+		let newY = snake.last.y
 
 		switch(snake.direction) {
 			case LEFT:
-				newX--;
-				break;
+				newX--
+				break
 			case UP:
-				newY--;
-				break;
+				newY--
+				break
 			case RIGHT:
-				newX++;
-				break;
+				newX++
+				break
 			case DOWN:
-				newY++;
-				break;
+				newY++
+				break
 		}
 
 		if ( 0 > newX || newX > board.width - 1 || 0 > newY || newY > board.height - 1 || board.get(newX, newY) == SNAKE) {
-			return init();
+			return init()
 		}
 
-		let tail;
+		let tail
 		if ( board.get(newX, newY) == FOOD ) {
-			tail = {x:newX, y:newY};
-			points++;
-			setFood();
+			tail = {x:newX, y:newY}
+			points++
+			setFood()
 		} else {
-			tail = snake.remove();
-			board.set(EMPTY, tail.x, tail.y);
-			tail.x = newX;
-			tail.y = newY;
+			tail = snake.remove()
+			board.set(EMPTY, tail.x, tail.y)
+			tail.x = newX
+			tail.y = newY
 		}
 
-		board.set(SNAKE, tail.x, tail.y);
-		snake.insert(tail.x, tail.y);
+		board.set(SNAKE, tail.x, tail.y)
+		snake.insert(tail.x, tail.y)
 
-		const score = document.getElementById("score");
-		score.innerHTML = "SCORE : " + points;
+		const score = document.getElementById("score")
+		score.innerHTML = "SCORE : " + points
 	}
 }
 
@@ -206,23 +206,23 @@ function draw() {
 		for ( let y = 0; y < board.height; y++ ) {
 			switch ( board.get(x, y) ) {
 				case EMPTY:
-					context.fillStyle = EMPTY_COLOR;
-					break;
+					context.fillStyle = EMPTY_COLOR
+					break
 				case SNAKE:
-					context.fillStyle = SNAKE_COLOR;
-					break;
+					context.fillStyle = SNAKE_COLOR
+					break
 				case FOOD:
-					context.fillStyle = FOOD_COLOR;
-					break;
+					context.fillStyle = FOOD_COLOR
+					break
 			}
-			context.fillRect( x * SIZE, y * SIZE, SIZE, SIZE );
+			context.fillRect( x * SIZE, y * SIZE, SIZE, SIZE )
 		}
 	}
 }
 
 //-----------------------------------------------------
 
-main();
+main()
 
 
 /*
